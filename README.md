@@ -14,4 +14,4 @@
 
 
 ## Contact
-Created by [Jeff Chen](Jeff Chen:jeff73511@msn.com) - feel free to contact me!
+Created by [Jeff Chen](mailto:jeff73511@msn.com) - feel free to contact me!
