@@ -21,7 +21,7 @@ with python and the two main libraries: Selenium and BeautifulSoup.
 * numpy
 * os
 * pandas
-* python 3.6
+* python 3.6+
 * selenium
 * sqlalchemy
 * sys
