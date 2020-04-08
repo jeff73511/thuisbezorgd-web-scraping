@@ -9,7 +9,7 @@ from selenium.webdriver.common.keys import Keys
 from thuisbezorgd_helper import restaurants
 
 
-os.chdir(r"/Users/Jeff1/PycharmProjects/NewProject/web_scraping")
+
 db = "thuisbezorgd.db"
 if os.path.isfile(db):
     os.remove(db)
