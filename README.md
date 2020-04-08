@@ -5,10 +5,6 @@
 * [Introduction](#introduction)
 * [Workflow](#workflow)
 * [Requirements](#requirements)
-* [Setup](#setup)
-* [Features](#features)
-* [Status](#status)
-* [Inspiration](#inspiration)
 * [Contact](#contact)
 
 ## Introduction
@@ -19,9 +15,17 @@ with python and the two main libraries: Selenium and BeautifulSoup.
 ![alt text](img/work_flow.jpg)
 
 ## Requirements
-* Tech 1 - version 1.0
-* Tech 2 - version 2.0
-* Tech 3 - version 3.0
+* BeautifulSoup
+* [ChromeDriver](https://chromedriver.chromium.org/downloads)
+* json
+* numpy
+* os
+* pandas
+* python 3.6
+* selenium
+* sqlalchemy
+* sys
+* time
 
 ## Contact
 Created by [Jeff Chen](mailto:jeff73511@msn.com) - feel free to contact me!
