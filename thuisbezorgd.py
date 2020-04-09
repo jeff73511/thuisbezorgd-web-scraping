@@ -14,9 +14,9 @@ db = "thuisbezorgd.db"
 if os.path.isfile(db):
     os.remove(db)
 
-chrome_path = r"/Users/Jeff1/PycharmProjects/NewProject/web_scraping/chromedriver"
+
 website = "https://www.thuisbezorgd.nl/en/"
-driver = webdriver.Chrome(chrome_path)
+driver = webdriver.Chrome()
 driver.get(website)
 
 search_bar = driver.find_element_by_id("imysearchstring")
