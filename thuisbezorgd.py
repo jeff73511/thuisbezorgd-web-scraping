@@ -1,38 +1,22 @@
-import sqlite3
-import sys
 import time
 import os
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from thuisbezorgd_helper import restaurants
+from thuisbezorgd_db import restaurants
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait as wait
+from thuisbezorgd_automation import thuisbezorgd
 
 
 db = "thuisbezorgd.db"
 if os.path.isfile(db):
     os.remove(db)
 
-website = "https://www.thuisbezorgd.nl/en/"
 driver = webdriver.Chrome(ChromeDriverManager().install())
-driver.get(website)
-
-search_bar = driver.find_element_by_id("imysearchstring")
-search_bar.click()
-
-NKI_address = "Plesmanlaan 121, 1066 CX Amsterdam"
-search_bar.send_keys(NKI_address)
-
-time.sleep(2)
-search_bar.send_keys(Keys.ENTER)
-
-time.sleep(2)
-driver.find_element_by_xpath("/html/body/div[5]/section/article/button").click()
-
-time.sleep(5)
-plain_text = driver.page_source
+NKI = "Plesmanlaan 121, 1066 CX Amsterdam"
+plain_text = thuisbezorgd(NKI, driver)
 
 record = []
 while True:
