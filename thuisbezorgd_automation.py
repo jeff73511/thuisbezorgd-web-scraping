@@ -1,4 +1,7 @@
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait as wait
 import time
 
 
@@ -32,3 +35,12 @@ def thuisbezorgd(address, driver):
     plain_text = driver.page_source
 
     return plain_text
+
+
+def click_an_option(driver, option):
+
+    wait(driver, 2).until(
+        EC.element_to_be_clickable(
+            (By.XPATH, f"//span[@class='swiper-slide__context'][text()='{option}']")
+        )
+    ).click()
