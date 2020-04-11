@@ -1,72 +1,71 @@
-import sys
-import time
-import json
 import os
-
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
+from thuisbezorgd_db import restaurants
+from webdriver_manager.chrome import ChromeDriverManager
+from thuisbezorgd_automation import thuisbezorgd, click_option, scroll, click_x
+from termcolor import colored
 
-from thuisbezorgd_helper import restaurants
 
-
-os.chdir(r"/Users/Jeff1/PycharmProjects/NewProject/web_scraping")
 db = "thuisbezorgd.db"
 if os.path.isfile(db):
     os.remove(db)
 
-chrome_path = r"/Users/Jeff1/PycharmProjects/NewProject/web_scraping/chromedriver"
-website = "https://www.thuisbezorgd.nl/en/"
-driver = webdriver.Chrome(chrome_path)
-driver.get(website)
+driver = webdriver.Chrome(ChromeDriverManager().install())
+NKI = "Plesmanlaan 121, 1066 CX Amsterdam"
+plain_text = thuisbezorgd(NKI, driver)
 
-search_bar = driver.find_element_by_id("imysearchstring")
-search_bar.click()
-
-NKI_address = "Plesmanlaan 121, 1066 CX Amsterdam"
-search_bar.send_keys(NKI_address)
-
-time.sleep(2)
-search_bar.send_keys(Keys.ENTER)
-
-time.sleep(5)
-plain_text = driver.page_source
-
-with open("cuisine_dic.json") as json_file:
-    cuisine_dic = json.load(json_file)
-
+favorite = []
 while True:
-    cuisine = input("Enter a cuisine style (or 'last page'/'next page'/'exit'):")
 
-    while True:
-        try:
-            if cuisine == "next page":
-                driver.find_element_by_xpath(
-                    "//*[@id='kitchen-types']/div/div/div[3]"
-                ).click()
+    try:
+        option = input(
+            "Enter a cuisine (or 'All'), 'Show more', or 'exit': "
+        )  # exit or others (all, cuisine, show more) 2
 
-            elif cuisine == "last page":
-                driver.find_element_by_xpath(
-                    "//*[@id='kitchen-types']/div/div/div[1]"
-                ).click()
-
-            elif cuisine == "exit":
-                break
-
-            else:
-                driver.find_element_by_xpath(
-                    f"//*[@id='kitchen-types']/div/div/div[2]/div/a[{cuisine_dic[cuisine]}]"
-                ).click()
-
-                restaurants(cuisine=cuisine, html=plain_text)
-
+        if option == "exit":  # exit
+            driver.quit()
             break
 
-        except:
-            print("Input is not correct! Try again.")
-            cuisine = input(
-                "Enter a cuisine style (or 'last page'/'next page'/'exit'):"
-            )
+        else:
+            if option in favorite:  # check if already selected a cuisine
+                print(f"You already hit {option}! Try something else!")
+                continue
 
-    if cuisine == "exit":
-        driver.quit()
-        sys.exit()
+            else:
+                click_option(driver, option)  # show more or others (all, cuisine) 2
+
+            if option != "Show more":  # all or cuisine
+                restaurants(cuisine=option, html=plain_text)
+                favorite.append(option)
+                continue
+
+            else:  # in show more: x, scroll(up/down), or  cuisine 3
+                while True:
+                    try:
+                        option_show_more = input(
+                            "Enter a cuisine, 'scroll (up/down)', or 'x': "
+                        )
+
+                        if option_show_more == "x":  # x
+                            click_x(driver)
+                            break
+
+                        elif option_show_more in ("scroll up", "scroll down"):  # scroll
+                            scroll(driver, option_show_more)
+
+                        else:  # cuisine
+                            if option_show_more in favorite:  # check if already selected a cuisine
+                                print(f"You already hit {option_show_more}! Try something else!")
+                                continue
+
+                            else:
+                                click_option(driver, option, option_show_more)
+                                restaurants(cuisine=option_show_more, html=plain_text)
+                                favorite.append(option_show_more)
+                                break
+
+                    except:
+                        print("Incorrect input! Try again!")
+
+    except:  # others cause error
+        print(colored("Incorrect input! Try again!", "red"))
