@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
 import time
+from termcolor import colored
 
 
 def restaurants_status(cuisine, status, html):
@@ -59,7 +60,7 @@ def restaurants(cuisine, html):
 
     message = f"Now scraping {cuisine}... \n"
     for wrd in message:
-        print(wrd, end="")
+        print(colored(wrd, "green"), end="")
         sys.stdout.flush()
         time.sleep(0.1)
 

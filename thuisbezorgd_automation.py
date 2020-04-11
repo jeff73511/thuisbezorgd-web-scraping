@@ -37,8 +37,9 @@ def thuisbezorgd(address, driver):
     return plain_text
 
 
-def click_an_option(driver, option=None, option_show_more=None):
+def click_option(driver, option=None, option_show_more=None):
 
+    time.sleep(2)
     dic = {"main": "swiper-slide__context", "pop_up": "tv-chip__inner-content"}
 
     if option_show_more == None:
@@ -53,4 +54,27 @@ def click_an_option(driver, option=None, option_show_more=None):
         EC.element_to_be_clickable(
             (By.XPATH, f"//span[@class='{where}'][text()='{cuisine}']")
         )
+    ).click()
+
+
+def scroll(driver, option_show_more):
+
+    time.sleep(2)
+    scroll_option = {
+        "scroll up": "0",
+        "scroll down": "arguments[0].scrollHeight",
+    }
+    pop_up = driver.find_element_by_xpath("/html/body/div[8]/div/div[2]")
+
+    driver.execute_script(
+        f"arguments[0].scrollTop = {scroll_option[option_show_more]}",
+        pop_up,
+    )
+
+
+def click_x(driver):
+
+    time.sleep(2)
+    driver.find_element_by_xpath(
+        "/html/body/div[8]/div/button"
     ).click()
