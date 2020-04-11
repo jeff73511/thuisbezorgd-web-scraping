@@ -37,10 +37,20 @@ def thuisbezorgd(address, driver):
     return plain_text
 
 
-def click_an_option(driver, option):
+def click_an_option(driver, option=None, option_show_more=None):
+
+    dic = {"main": "swiper-slide__context", "pop_up": "tv-chip__inner-content"}
+
+    if option_show_more == None:
+        where = dic["main"]
+        cuisine = option
+
+    else:
+        where = dic["pop_up"]
+        cuisine = option_show_more
 
     wait(driver, 2).until(
         EC.element_to_be_clickable(
-            (By.XPATH, f"//span[@class='swiper-slide__context'][text()='{option}']")
+            (By.XPATH, f"//span[@class='{where}'][text()='{cuisine}']")
         )
     ).click()

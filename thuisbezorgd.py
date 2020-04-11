@@ -1,12 +1,7 @@
-import time
 import os
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from thuisbezorgd_db import restaurants
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait as wait
 from thuisbezorgd_automation import thuisbezorgd, click_an_option
 
 
@@ -73,14 +68,7 @@ while True:
                                 continue
 
                             else:
-                                wait(driver, 2).until(
-                                    EC.element_to_be_clickable(
-                                        (
-                                            By.XPATH,
-                                            f"//span[@class='tv-chip__inner-content'][text()='{option_show_more}']",
-                                        )
-                                    )
-                                ).click()
+                                click_an_option(driver, option, option_show_more)
                                 restaurants(cuisine=option_show_more, html=plain_text)
                                 favorite.append(option_show_more)
                                 break
