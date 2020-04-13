@@ -27,8 +27,8 @@ def thuisbezorgd(address, driver):
     driver.find_element_by_xpath(cookies).click()
 
     # maximize the window
-    time.sleep(2)
-    driver.maximize_window()
+    # time.sleep(2)
+    # driver.maximize_window()
 
     # load the information of restaurants
     time.sleep(2)
@@ -64,7 +64,13 @@ def scroll(driver, option_show_more):
         "scroll up": "0",
         "scroll down": "arguments[0].scrollHeight",
     }
-    pop_up = driver.find_element_by_xpath("/html/body/div[8]/div/div[2]")
+
+    # pop_up = driver.find_element_by_xpath("/html/body/div[8]/div/div[2]")
+
+    try :
+        pop_up = driver.find_element_by_xpath("/html/body/div[7]/div/div[2]")
+    except:
+        pop_up = driver.find_element_by_xpath("/html/body/div[8]/div/div[2]")
 
     driver.execute_script(
         f"arguments[0].scrollTop = {scroll_option[option_show_more]}",
