@@ -46,7 +46,7 @@ while True:
                             "Enter a cuisine, 'scroll (up/down)', or 'x': "
                         )
 
-                        if option_show_more == "x":  # x
+                        if option_show_more == "x":
                             click_x(driver)
                             break
 
