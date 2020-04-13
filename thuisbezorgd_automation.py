@@ -21,14 +21,10 @@ def thuisbezorgd(address, driver):
     time.sleep(2)
     search_bar.send_keys(Keys.ENTER)
 
-    # click away the "ok" button for cookies
+    # click away "ok" for cookies
     time.sleep(2)
     cookies = "/html/body/div[5]/section/article/button"
     driver.find_element_by_xpath(cookies).click()
-
-    # maximize the window
-    time.sleep(2)
-    driver.maximize_window()
 
     # load the information of restaurants
     time.sleep(2)
@@ -60,21 +56,20 @@ def click_option(driver, option=None, option_show_more=None):
 def scroll(driver, option_show_more):
 
     time.sleep(2)
-    scroll_option = {
-        "scroll up": "0",
-        "scroll down": "arguments[0].scrollHeight",
-    }
-    pop_up = driver.find_element_by_xpath("/html/body/div[8]/div/div[2]")
+    scroll_option = {"scroll up": "0", "scroll down": "arguments[0].scrollHeight"}
+
+    pop_up = wait(driver, 2).until(
+        EC.element_to_be_clickable((By.XPATH, "//div[@class='tv-popup__content']"))
+    )
 
     driver.execute_script(
-        f"arguments[0].scrollTop = {scroll_option[option_show_more]}",
-        pop_up,
+        f"arguments[0].scrollTop = {scroll_option[option_show_more]}", pop_up
     )
 
 
 def click_x(driver):
 
     time.sleep(2)
-    driver.find_element_by_xpath(
-        "/html/body/div[8]/div/button"
+    wait(driver, 2).until(
+        EC.element_to_be_clickable((By.XPATH, "//div[@class='tv-icon']"))
     ).click()

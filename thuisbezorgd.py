@@ -20,26 +20,26 @@ while True:
     try:
         option = input(
             "Enter a cuisine (or 'All'), 'Show more', or 'exit': "
-        )  # exit or others (all, cuisine, show more) 2
+        )
 
-        if option == "exit":  # exit
+        if option == "exit":
             driver.quit()
             break
 
         else:
-            if option in favorite:  # check if already selected a cuisine
+            if option in favorite:
                 print(f"You already hit {option}! Try something else!")
                 continue
 
             else:
-                click_option(driver, option)  # show more or others (all, cuisine) 2
+                click_option(driver, option)
 
-            if option != "Show more":  # all or cuisine
+            if option != "Show more":
                 restaurants(cuisine=option, html=plain_text)
                 favorite.append(option)
                 continue
 
-            else:  # in show more: x, scroll(up/down), or  cuisine 3
+            else:
                 while True:
                     try:
                         option_show_more = input(
@@ -50,11 +50,11 @@ while True:
                             click_x(driver)
                             break
 
-                        elif option_show_more in ("scroll up", "scroll down"):  # scroll
+                        elif option_show_more in ("scroll up", "scroll down"):
                             scroll(driver, option_show_more)
 
-                        else:  # cuisine
-                            if option_show_more in favorite:  # check if already selected a cuisine
+                        else:
+                            if option_show_more in favorite:
                                 print(f"You already hit {option_show_more}! Try something else!")
                                 continue
 
@@ -65,7 +65,7 @@ while True:
                                 break
 
                     except:
-                        print("Incorrect input! Try again!")
+                        print(colored("Incorrect input! Try again!", "red"))
 
-    except:  # others cause error
+    except:
         print(colored("Incorrect input! Try again!", "red"))
