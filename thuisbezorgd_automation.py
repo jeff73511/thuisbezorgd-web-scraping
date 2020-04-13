@@ -41,7 +41,6 @@ def click_option(driver, option=None, option_show_more=None):
     if option_show_more == None:
         where = dic["main"]
         cuisine = option
-
     else:
         where = dic["pop_up"]
         cuisine = option_show_more
@@ -61,7 +60,6 @@ def scroll(driver, option_show_more):
     pop_up = wait(driver, 2).until(
         EC.element_to_be_clickable((By.XPATH, "//div[@class='tv-popup__content']"))
     )
-
     driver.execute_script(
         f"arguments[0].scrollTop = {scroll_option[option_show_more]}", pop_up
     )

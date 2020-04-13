@@ -16,29 +16,23 @@ plain_text = thuisbezorgd(NKI, driver)
 
 favorite = []
 while True:
-
     try:
-        option = input(
-            "Enter a cuisine (or 'All'), 'Show more', or 'exit': "
-        )
+        option = input("Enter a cuisine (or 'All'), 'Show more', or 'exit': ")
 
         if option == "exit":
             driver.quit()
             break
-
         else:
             if option in favorite:
                 print(f"You already hit {option}! Try something else!")
                 continue
 
-            else:
-                click_option(driver, option)
+            click_option(driver, option)
 
             if option != "Show more":
                 restaurants(cuisine=option, html=plain_text)
                 favorite.append(option)
                 continue
-
             else:
                 while True:
                     try:
@@ -49,20 +43,18 @@ while True:
                         if option_show_more == "x":
                             click_x(driver)
                             break
-
                         elif option_show_more in ("scroll up", "scroll down"):
                             scroll(driver, option_show_more)
-
                         else:
                             if option_show_more in favorite:
-                                print(f"You already hit {option_show_more}! Try something else!")
+                                print(
+                                    f"You already hit {option_show_more}! Try something else!"
+                                )
                                 continue
-
-                            else:
-                                click_option(driver, option, option_show_more)
-                                restaurants(cuisine=option_show_more, html=plain_text)
-                                favorite.append(option_show_more)
-                                break
+                            click_option(driver, option, option_show_more)
+                            restaurants(cuisine=option_show_more, html=plain_text)
+                            favorite.append(option_show_more)
+                            break
 
                     except:
                         print(colored("Incorrect input! Try again!", "red"))
