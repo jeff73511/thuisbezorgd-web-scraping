@@ -21,14 +21,10 @@ def thuisbezorgd(address, driver):
     time.sleep(2)
     search_bar.send_keys(Keys.ENTER)
 
-    # click away the "ok" button for cookies
+    # click away "ok" for cookies
     time.sleep(2)
     cookies = "/html/body/div[5]/section/article/button"
     driver.find_element_by_xpath(cookies).click()
-
-    # maximize the window
-    # time.sleep(2)
-    # driver.maximize_window()
 
     # load the information of restaurants
     time.sleep(2)
