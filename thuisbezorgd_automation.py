@@ -60,27 +60,20 @@ def click_option(driver, option=None, option_show_more=None):
 def scroll(driver, option_show_more):
 
     time.sleep(2)
-    scroll_option = {
-        "scroll up": "0",
-        "scroll down": "arguments[0].scrollHeight",
-    }
+    scroll_option = {"scroll up": "0", "scroll down": "arguments[0].scrollHeight"}
 
-    # pop_up = driver.find_element_by_xpath("/html/body/div[8]/div/div[2]")
-
-    try :
-        pop_up = driver.find_element_by_xpath("/html/body/div[7]/div/div[2]")
-    except:
-        pop_up = driver.find_element_by_xpath("/html/body/div[8]/div/div[2]")
+    pop_up = wait(driver, 2).until(
+        EC.element_to_be_clickable((By.XPATH, "//div[@class='tv-popup__content']"))
+    )
 
     driver.execute_script(
-        f"arguments[0].scrollTop = {scroll_option[option_show_more]}",
-        pop_up,
+        f"arguments[0].scrollTop = {scroll_option[option_show_more]}", pop_up
     )
 
 
 def click_x(driver):
 
     time.sleep(2)
-    driver.find_element_by_xpath(
-        "/html/body/div[8]/div/button"
+    wait(driver, 2).until(
+        EC.element_to_be_clickable((By.XPATH, "//div[@class='tv-icon']"))
     ).click()

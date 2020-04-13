@@ -65,7 +65,7 @@ while True:
                                 break
 
                     except:
-                        print("Incorrect input! Try again!")
+                        print(colored("Incorrect input! Try again!", "red"))
 
     except:  # others cause error
         print(colored("Incorrect input! Try again!", "red"))
