@@ -16,7 +16,6 @@ with python and the two main libraries: Selenium and BeautifulSoup.
 
 ## Requirements
 * BeautifulSoup
-* [ChromeDriver](https://chromedriver.chromium.org/downloads)
 * json
 * numpy
 * os
@@ -25,7 +24,19 @@ with python and the two main libraries: Selenium and BeautifulSoup.
 * selenium
 * sqlalchemy
 * sys
+* termcolor
 * time
+* webdriver_manager
+
+
+Please note that in addition to the list of libraries mentioned above, you 
+will still need a browser driver to simulate browser sessions. In this project
+I use [ChromeDriver](https://chromedriver.chromium.org/downloads). However, 
+with webdriver_manager, you do not need to explicitly download binary 
+[ChromeDriver](https://chromedriver.chromium.org/downloads), unzip it somewhere 
+in your PC, and set path to it. The webdriver_manager module will take care of 
+everything for you!
+
 
 ## Contact
 Created by [Jeff Chen](mailto:jeff73511@msn.com) - feel free to contact me!
