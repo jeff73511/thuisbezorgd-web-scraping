@@ -6,6 +6,14 @@ import time
 
 
 def thuisbezorgd(address, driver):
+    """ This automation function opens the web brower, goes to
+    the thuisbezorgd website, fills in the location address, and
+    returns the source of current page.
+
+    :param address: str, location.
+    :param driver: WebDriver, web driver to drive the browser.
+    :return: str, source of current page.
+    """
 
     website = "https://www.thuisbezorgd.nl/en/"
     driver.get(website)
@@ -34,6 +42,13 @@ def thuisbezorgd(address, driver):
 
 
 def click_option(driver, option=None, option_show_more=None):
+    """ This automation function clicks one of cuisines on the website or
+    the option, "show more".
+
+    :param driver: WebDriver, web driver to drive the browser.
+    :param option: str, cuisine shown on the site or "show more".
+    :param option_show_more: str, cuisine shown on the site in the pop up screen.
+    """
 
     time.sleep(2)
     dic = {"main": "swiper-slide__context", "pop_up": "tv-chip__inner-content"}
@@ -53,6 +68,12 @@ def click_option(driver, option=None, option_show_more=None):
 
 
 def scroll(driver, option_show_more):
+    """ This automation function scrolls up or down the pop up screen
+    from the "show more" option.
+
+    :param driver: WebDriver, web driver to drive the browser.
+    :param option_show_more: str, "sroll up" or "scroll down".
+    """
 
     time.sleep(2)
     scroll_option = {"scroll up": "0", "scroll down": "arguments[0].scrollHeight"}
@@ -66,6 +87,11 @@ def scroll(driver, option_show_more):
 
 
 def click_x(driver):
+    """ This automation function closes the pop up screen from the
+    "show more" option.
+
+    :param driver: WebDriver, web driver to drive the browser.
+    """
 
     time.sleep(2)
     wait(driver, 2).until(

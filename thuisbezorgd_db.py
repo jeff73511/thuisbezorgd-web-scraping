@@ -8,6 +8,15 @@ from termcolor import colored
 
 
 def restaurants_status(cuisine, status, html):
+    """ This function gets all the information of a cuisine according to the
+    status ("open", "preorder", or "closed") of restaurants.
+
+    :param cuisine: str, cuisine shown on the site.
+    :param status: str, status of retaurants: "open", "preorder", or "closed".
+    :param html: str, source of current page.
+    :return: DataFrame, dataframe that stores information of restaurants under a certain status.
+    """
+
     soup = BeautifulSoup(html, "html.parser")
     soup = soup.find("div", {"class": f"js-restaurant-list-{status}"})
 
@@ -56,6 +65,12 @@ def restaurants_status(cuisine, status, html):
 
 
 def restaurants(cuisine, html):
+    """ This function stores all the information of restaurants of a cuisine
+    in a data base.
+
+    :param cuisine: str, cuisine shown on the site.
+    :param html: str, source of current page.
+    """
 
     message = f"Now scraping {cuisine}... \n"
     for wrd in message:
