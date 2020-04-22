@@ -1,6 +1,6 @@
 import sys
 from bs4 import BeautifulSoup
-import numpy as np
+from itertools import compress
 import pandas as pd
 from sqlalchemy import create_engine
 import time
@@ -12,45 +12,53 @@ def restaurants_status(cuisine, status, html):
     status ("open", "preorder", or "closed") of restaurants.
 
     :param cuisine: str, cuisine shown on the site.
-    :param status: str, status of retaurants: "open", "preorder", or "closed".
+    :param status: str, status of retaurants: "open", "pre-order", or "closed".
     :param html: str, source of current page.
     :return: DataFrame, dataframe that stores information of restaurants under a certain status.
     """
 
-    soup = BeautifulSoup(html, "html.parser")
-    soup = soup.find("div", {"class": f"js-restaurant-list-{status}"})
-
-    kitchens = soup.findAll("div", {"class": "kitchens"})
-    kitchens = [kitchen.text.strip() for kitchen in kitchens]
-    filter = np.array([cuisine in style for style in kitchens])
-
-    names = soup.findAll("a", {"class": "restaurantname"})
-    names = np.array([name.text.strip() for name in names])[filter]
-
-    ratings = soup.findAll("span", {"class": "rating-total"})
-    ratings = np.array([rating.text.strip("(").strip(")") for rating in ratings])[
-        filter
-    ]
-
-    deliver_time = soup.findAll(
-        "div", {"class": "avgdeliverytime avgdeliverytimefull open"}
+    soups = BeautifulSoup(html, "html.parser")
+    soups = soups.findAll(
+        "div", {"class": f"js-restaurant restaurant restaurant__{status}"}
     )
-    if len(deliver_time) == 0 or status == "closed":
-        deliver_time = "not available"
-    else:
-        deliver_time = np.array([time.text for time in deliver_time])[filter]
 
-    deliver_cost = soup.findAll("div", {"class": "delivery-cost js-delivery-cost"})
-    if len(deliver_cost) == 0 or status == "closed":
-        deliver_cost = "not available"
-    else:
-        deliver_cost = np.array([cost.text for cost in deliver_cost])[filter]
+    kitchens, names, ratings, deliver_time, deliver_cost, min_order = [], [], [], [], [], []
+    for soup in soups:
+        kitchen = soup.find("div", {"class": "kitchens"}).text.strip()
+        kitchens.append(kitchen)
 
-    min_order = soup.findAll("div", {"class": "min-order"})
-    if len(min_order) == 0 or status == "closed":
-        min_order = "not available"
-    else:
-        min_order = np.array([order.text for order in min_order])[filter]
+        name = soup.find("a", {"class": "restaurantname"}).text.strip()
+        names.append(name)
+
+        rating = soup.find("span", {"class": "rating-total"}).text.strip("(").strip(")")
+        ratings.append(rating)
+
+        if status != "closed":
+            time = soup.find(
+                "div", {"class": "avgdeliverytime avgdeliverytimefull open"}
+            ).text.strip()
+            deliver_time.append(time)
+
+            cost = soup.find(
+                "div", {"class": "delivery-cost js-delivery-cost"}
+            ).text.strip()
+            deliver_cost.append(cost)
+
+            order = soup.find("div", {"class": "min-order"}).text.strip()
+            min_order.append(order)
+
+        else:
+            deliver_time.append("Closed for delivery")
+            deliver_cost.append("Closed for delivery")
+            min_order.append("Closed for delivery")
+
+    if cuisine!= "All":
+        get = [cuisine in style for style in kitchens]
+        names = list(compress(names, get))
+        ratings = list(compress(ratings, get))
+        deliver_time = list(compress(deliver_time, get))
+        deliver_cost = list(compress(deliver_cost, get))
+        min_order = list(compress(min_order, get))
 
     result = {
         "names": names,
@@ -78,7 +86,7 @@ def restaurants(cuisine, html):
         sys.stdout.flush()
         time.sleep(0.1)
 
-    status = ["open", "preorder", "closed"]
+    status = ["open", "pre-order", "closed"]
     data = pd.DataFrame()
     for s in status:
         data = data.append(
