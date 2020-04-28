@@ -5,6 +5,7 @@
 * [Introduction](#introduction)
 * [Workflow](#workflow)
 * [Requirements](#requirements)
+* [Usage](#usage)
 * [Contact](#contact)
 
 ## Introduction
@@ -36,6 +37,9 @@ with webdriver_manager, you do not need to explicitly download binary
 [ChromeDriver](https://chromedriver.chromium.org/downloads), unzip it somewhere 
 in your PC, and set path to it. The webdriver_manager module will take care of 
 everything for you!
+
+## Usage
+Run [thuisbezorgd.py](./thuisbezorgd.py) and follow the instructions shown in the Python console.
 
 
 ## Contact
