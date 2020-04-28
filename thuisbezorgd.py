@@ -4,7 +4,7 @@ from thuisbezorgd_db import restaurants
 from webdriver_manager.chrome import ChromeDriverManager
 from thuisbezorgd_automation import thuisbezorgd, click_option, scroll, click_x
 from termcolor import colored
-
+from sqlalchemy import create_engine
 
 db = "thuisbezorgd.db"
 if os.path.isfile(db):
@@ -13,6 +13,7 @@ if os.path.isfile(db):
 driver = webdriver.Chrome(ChromeDriverManager().install())
 NKI = "Plesmanlaan 121, 1066 CX Amsterdam"
 plain_text = thuisbezorgd(NKI, driver)
+engine = create_engine("sqlite:///thuisbezorgd.db")
 
 favorite = []
 while True:
@@ -30,7 +31,7 @@ while True:
             click_option(driver, option)
 
             if option != "Show more":
-                restaurants(cuisine=option, html=plain_text)
+                restaurants(cuisine=option, html=plain_text, engine=engine)
                 favorite.append(option)
                 continue
             else:
@@ -52,7 +53,7 @@ while True:
                                 )
                                 continue
                             click_option(driver, option, option_show_more)
-                            restaurants(cuisine=option_show_more, html=plain_text)
+                            restaurants(cuisine=option_show_more, html=plain_text, engine=engine)
                             favorite.append(option_show_more)
                             break
 

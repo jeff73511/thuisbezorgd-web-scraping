@@ -2,7 +2,6 @@ import sys
 from bs4 import BeautifulSoup
 from itertools import compress
 import pandas as pd
-from sqlalchemy import create_engine
 import time
 from termcolor import colored
 
@@ -72,7 +71,7 @@ def restaurants_status(cuisine, status, html):
     return pd.DataFrame(result)
 
 
-def restaurants(cuisine, html):
+def restaurants(cuisine, html, engine):
     """ This function stores all the information of restaurants of a cuisine
     in a data base.
 
@@ -93,5 +92,4 @@ def restaurants(cuisine, html):
             restaurants_status(cuisine=cuisine, status=s, html=html), ignore_index=True
         )
 
-    engine = create_engine("sqlite:///thuisbezorgd.db")
     data.to_sql(f"{cuisine}", con=engine, if_exists="replace", index=False)
