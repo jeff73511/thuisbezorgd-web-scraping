@@ -7,7 +7,7 @@ import time
 
 
 @pytest.fixture()
-def engine(tmpdir):
+def test_engine(tmpdir):
     """"""
     return create_engine(f"sqlite:///{tmpdir}/thuisbezorgd.db")
 
