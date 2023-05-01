@@ -1,48 +1,70 @@
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait as wait
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.remote.webelement import WebElement
 import time
+import undetected_chromedriver as uc
 
 
-def thuisbezorgd(address, driver):
-    """ This automation function opens the web brower, goes to
+def find_web_element(
+        driver,
+        options: str,
+        field_name: str,
+        webdriver_timeout: float = 5,
+        poll_frequency: float = 0.05,
+) -> WebElement:
+    """Find WebElement by a locator.
+    Args:
+        options: Attribute used to locate element on a web page.
+        field_name: Value of a web element attribute.
+    Returns:
+        A Selenuim WebElement.
+    """
+
+    return WebDriverWait(
+        driver,
+        timeout=webdriver_timeout,
+        poll_frequency=poll_frequency,
+    ).until(lambda d: d.find_element(options, field_name))
+
+
+def initiate_driver(address):
+    """This automation function opens the web browser, goes to
     the thuisbezorgd website, fills in the location address, and
     returns the source of current page.
 
     :param address: str, location.
-    :param driver: WebDriver, web driver to drive the browser.
     :return: str, source of current page.
     """
 
-    website = "https://www.thuisbezorgd.nl/en/"
-    driver.get(website)
+    options = uc.ChromeOptions()
+    options.add_argument('--deny-permission-prompts')
+    driver = uc.Chrome(options=options)
+    driver.get("https://www.thuisbezorgd.nl/en/")
 
-    # click the search bar in order to get rid of any autofilled address
-    search_bar = driver.find_element_by_id("imysearchstring")
-    search_bar.click()
+    # Click away "ok" for cookies
+    element = find_web_element(driver=driver, options=By.CSS_SELECTOR,
+                               field_name="._908LZ._1bx49._20B3B._4R7G3.YG2eu._2JFg2")
+    element.click()
 
-    # insert the address
-    search_bar.send_keys(address)
+    # Insert the address
+    element = find_web_element(driver=driver, options=By.NAME, field_name="searchText")
+    element.send_keys(address)
 
-    # hit the enter key
-    time.sleep(2)
-    search_bar.send_keys(Keys.ENTER)
+    # Click on suggestion
+    element = find_web_element(driver=driver, options=By.CSS_SELECTOR, field_name="._2GljJ._2PIGg")
+    element.click()
 
-    # click away "ok" for cookies
-    time.sleep(2)
-    cookies = "/html/body/div[5]/section/article/button"
-    driver.find_element_by_xpath(cookies).click()
+    # # load the information of restaurants
+    # time.sleep(2)
+    # plain_text = driver.page_source
 
-    # load the information of restaurants
-    time.sleep(2)
-    plain_text = driver.page_source
-
-    return plain_text
+    return driver
 
 
 def click_option(driver, option=None, option_show_more=None):
-    """ This automation function clicks one of cuisines on the website or
+    """This automation function clicks one of cuisines on the website or
     the option, "show more".
 
     :param driver: WebDriver, web driver to drive the browser.
@@ -50,25 +72,11 @@ def click_option(driver, option=None, option_show_more=None):
     :param option_show_more: str, cuisine shown on the site in the pop up screen.
     """
 
-    time.sleep(2)
-    dic = {"main": "swiper-slide__context", "pop_up": "tv-chip__inner-content"}
-
-    if option_show_more == None:
-        where = dic["main"]
-        cuisine = option
-    else:
-        where = dic["pop_up"]
-        cuisine = option_show_more
-
-    wait(driver, 2).until(
-        EC.element_to_be_clickable(
-            (By.XPATH, f"//span[@class='{where}'][text()='{cuisine}']")
-        )
-    ).click()
+    find_web_element(driver, options=By.XPATH, field_name=f"//div[@class='_3wa4B' and text()='{option}']").click()
 
 
 def scroll(driver, option_show_more):
-    """ This automation function scrolls up or down the pop up screen
+    """This automation function scrolls up or down the pop up screen
     from the "show more" option.
 
     :param driver: WebDriver, web driver to drive the browser.
@@ -87,7 +95,7 @@ def scroll(driver, option_show_more):
 
 
 def click_x(driver):
-    """ This automation function closes the pop up screen from the
+    """This automation function closes the pop up screen from the
     "show more" option.
 
     :param driver: WebDriver, web driver to drive the browser.

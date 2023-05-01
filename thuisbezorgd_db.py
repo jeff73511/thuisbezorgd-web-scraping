@@ -1,49 +1,48 @@
-import sys
 from bs4 import BeautifulSoup
-from itertools import compress
-import pandas as pd
-import time
-from termcolor import colored
+from pandas import DataFrame, concat
+from undetected_chromedriver import Chrome
+from sqlalchemy import Engine
 
 
-def restaurants_status(cuisine, status, html):
-    """ This function gets all the information of a cuisine according to the
+def restaurants_status(cuisine: str, status: str, driver: Chrome) -> DataFrame:
+    """Gets all the information of a cuisine according to the
     status ("open", "preorder", or "closed") of restaurants.
 
-    :param cuisine: str, cuisine shown on the site.
-    :param status: str, status of retaurants: "open", "pre-order", or "closed".
-    :param html: str, source of current page.
-    :return: DataFrame, dataframe that stores information of restaurants under a certain status.
+    :param cuisine: Cuisine shown on the site.
+    :param status: Status of restaurants: "open", "pre-order", or "closed".
+    :param driver: ChromeDriver.
+    :return: A dataframe that stores information of restaurants under a certain status.
     """
 
-    soups = BeautifulSoup(html, "html.parser")
-    soups = soups.findAll(
-        "div", {"class": f"js-restaurant restaurant restaurant__{status}"}
+    html = driver.execute_script(
+        "return document.getElementsByTagName('html')[0].innerHTML"
     )
+    soups = BeautifulSoup(html, "html.parser")
+    soups = soups.find("section", {"data-qa": f"restaurant-list-{status}-section"})
+    soups = soups.findAll("li", {"class": "_2ro375"})
 
-    kitchens, names, ratings, deliver_time, deliver_cost, min_order = [], [], [], [], [], []
+    names, ratings, deliver_time, deliver_cost, min_order = [], [], [], [], []
     for soup in soups:
-        kitchen = soup.find("div", {"class": "kitchens"}).text.strip()
-        kitchens.append(kitchen)
-
-        name = soup.find("a", {"class": "restaurantname"}).text.strip()
+        name = soup.find("h3", {"data-qa": "restaurant-info-name"}).text
         names.append(name)
 
-        rating = soup.find("span", {"class": "rating-total"}).text.strip("(").strip(")")
+        try:
+            rating = soup.find("b", {"data-qa": "restaurant-rating-score"}).text
+        except AttributeError:
+            rating = "No rating available"
         ratings.append(rating)
 
         if status != "closed":
-            time = soup.find(
-                "div", {"class": "avgdeliverytime avgdeliverytimefull open"}
-            ).text.strip()
-            deliver_time.append(time)
+            eta = soup.find("div", {"data-qa": "shipping-time-indicator-content"}).text
+            deliver_time.append(eta)
 
             cost = soup.find(
-                "div", {"class": "delivery-cost js-delivery-cost"}
-            ).text.strip()
+                "div", {"data-qa": "delivery-costs-indicator-content"}
+            ).text
+            cost = cost.replace("\xa0", " ")
             deliver_cost.append(cost)
 
-            order = soup.find("div", {"class": "min-order"}).text.strip()
+            order = soup.find("div", {"data-qa": "mov-indicator-content"}).text
             min_order.append(order)
 
         else:
@@ -51,15 +50,8 @@ def restaurants_status(cuisine, status, html):
             deliver_cost.append("Closed for delivery")
             min_order.append("Closed for delivery")
 
-    if cuisine!= "All":
-        get = [cuisine in style for style in kitchens]
-        names = list(compress(names, get))
-        ratings = list(compress(ratings, get))
-        deliver_time = list(compress(deliver_time, get))
-        deliver_cost = list(compress(deliver_cost, get))
-        min_order = list(compress(min_order, get))
-
     result = {
+        "cuisine": cuisine,
         "names": names,
         "ratings": ratings,
         "deliver_time": deliver_time,
@@ -68,28 +60,24 @@ def restaurants_status(cuisine, status, html):
         "status": status,
     }
 
-    return pd.DataFrame(result)
+    return DataFrame(result)
 
 
-def restaurants(cuisine, html, engine):
-    """ This function stores all the information of restaurants of a cuisine
-    in a data base.
+def restaurants(cuisine: str, driver: Chrome, engine: Engine) -> None:
+    """Stores all the information of restaurants of a cuisine
+    in a database.
 
-    :param cuisine: str, cuisine shown on the site.
-    :param html: str, source of current page.
+    :param cuisine: Cuisine shown on the site.
+    :param driver: ChromeDriver.
+    :param engine: A central object that provides connectivity to a database.
     """
 
-    message = f"Now scraping {cuisine}... \n"
-    for wrd in message:
-        print(colored(wrd, "green"), end="")
-        sys.stdout.flush()
-        time.sleep(0.1)
-
     status = ["open", "pre-order", "closed"]
-    data = pd.DataFrame()
+    df = DataFrame()
     for s in status:
-        data = data.append(
-            restaurants_status(cuisine=cuisine, status=s, html=html), ignore_index=True
+        df = concat(
+            [df, restaurants_status(cuisine=cuisine, status=s, driver=driver)],
+            ignore_index=True,
         )
 
-    data.to_sql(f"{cuisine}", con=engine, if_exists="replace", index=False)
+    df.to_sql(f"{cuisine}", con=engine, if_exists="replace", index=False)
