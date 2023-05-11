@@ -1,8 +1,11 @@
 import os
+import time
+
+import keyboard
 from thuisbezorgd_db import restaurants
-from thuisbezorgd_automation import initiate_driver, click_option, scroll, click_x
-from termcolor import colored
+from thuisbezorgd_automation import initiate_driver, click, scroll
 from sqlalchemy import create_engine
+from selenium.webdriver.common.by import By
 
 
 if __name__ == "__main__":
@@ -14,51 +17,92 @@ if __name__ == "__main__":
     NKI = "Plesmanlaan 121, 1066 CX Amsterdam"
     driver = initiate_driver(address=NKI)
 
-    favorite = []
+    favorites, clicked = [], ""
     while True:
         try:
-            option = input("Enter a cuisine (or 'All'), 'Show more', or 'Exit': ")
-            option = option.capitalize()
+            option = input("Enter a cuisine, 'All', 'Show more', or 'Exit': ").capitalize()
 
             if option == "Exit":
                 driver.quit()
                 break
+            elif option == "All":
+                restaurants(cuisine=option, driver=driver, engine=engine)
+                driver.quit()
+                break
             else:
-                if option in favorite:
+                if option in favorites:
                     print(f"You already hit {option}! Try something else!")
                     continue
-
-                click_option(driver, option)
-
-                if option != "Show more":
+                elif option != "Show more":
+                    if clicked:
+                        click(
+                            driver,
+                            options=By.XPATH,
+                            field_name=f"//div[@class='_3wa4B' and text()='{clicked}']",
+                        )
+                        clicked = ""
+                    click(
+                        driver,
+                        options=By.XPATH,
+                        field_name=f"//div[@class='_3wa4B' and text()='{option}']",
+                    )
+                    clicked = option
                     restaurants(cuisine=option, driver=driver, engine=engine)
-                    favorite.append(option)
+                    favorites.append(option)
                     continue
                 else:
+                    if clicked:
+                        click(
+                            driver,
+                            options=By.XPATH,
+                            field_name=f"//div[@class='_3wa4B' and text()='{clicked}']",
+                        )
+                        clicked = ""
+                    click(
+                        driver,
+                        options=By.XPATH,
+                        field_name=f"//span[@class='ygmw2' and text()='{option}']",
+                    )
+                    print(
+                        "Press up or down arrow key to scroll, 'x' to close the pop-up, or hit 'ENTER' to type a "
+                        "cuisine "
+                    )
                     while True:
-                        try:
-                            option_show_more = input(
-                                "Enter a cuisine, 'scroll (up/down)', or 'x': "
+                        if keyboard.is_pressed("up"):
+                            scroll(driver, direction="up")
+                        elif keyboard.is_pressed("down"):
+                            scroll(driver)
+                        elif keyboard.is_pressed("x"):
+                            click(
+                                driver,
+                                options=By.XPATH,
+                                field_name="//span[@data-qa='cuisine-filter-modal-header-action-close']",
                             )
-
-                            if option_show_more == "x":
-                                click_x(driver)
-                                break
-                            elif option_show_more in ("scroll up", "scroll down"):
-                                scroll(driver, option_show_more)
-                            else:
-                                if option_show_more in favorite:
-                                    print(
-                                        f"You already hit {option_show_more}! Try something else!"
-                                    )
-                                    continue
-                                click_option(driver, option, option_show_more)
-                                restaurants(cuisine=option, driver=driver, engine=engine)
-                                favorite.append(option_show_more)
-                                break
-
-                        except Exception:
-                            print(colored("Incorrect input! Try again!", "red"))
-
-        except:
-            print(colored("Incorrect input! Try again!", "red"))
+                            break
+                        elif keyboard.is_pressed("enter"):
+                            while True:
+                                try:
+                                    time.sleep(1)
+                                    option = input("Enter a cuisine: ").capitalize()
+                                    if option in favorites:
+                                        print(
+                                            f"You already hit {option}! Try something else!"
+                                        )
+                                        continue
+                                    else:
+                                        click(
+                                            driver,
+                                            options=By.XPATH,
+                                            field_name=f"//div[@class='_3wa4B' and starts-with(text(), '{option}')]",
+                                        )
+                                        clicked = option
+                                        restaurants(
+                                            cuisine=option, driver=driver, engine=engine
+                                        )
+                                        favorites.append(option)
+                                        break
+                                except Exception:
+                                    print("\033[91mWrong input! Try again!!\033[0m")
+                            break
+        except Exception:
+            print("\033[91mWrong input! Try again!!\033[0m")

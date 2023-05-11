@@ -1,3 +1,5 @@
+import time
+
 from bs4 import BeautifulSoup
 from pandas import DataFrame, concat
 from undetected_chromedriver import Chrome
@@ -14,12 +16,17 @@ def restaurants_status(cuisine: str, status: str, driver: Chrome) -> DataFrame:
     :return: A dataframe that stores information of restaurants under a certain status.
     """
 
-    html = driver.execute_script(
-        "return document.getElementsByTagName('html')[0].innerHTML"
-    )
+    html = driver.page_source
     soups = BeautifulSoup(html, "html.parser")
     soups = soups.find("section", {"data-qa": f"restaurant-list-{status}-section"})
-    soups = soups.findAll("li", {"class": "_2ro375"})
+
+    try:
+        soups = soups.findAll("li", {"class": "_2ro375"})
+    except AttributeError as e:
+        if str(e) == "'NoneType' object has no attribute 'findAll'":
+            return DataFrame()
+        else:
+            raise
 
     names, ratings, deliver_time, deliver_cost, min_order = [], [], [], [], []
     for soup in soups:
@@ -52,8 +59,8 @@ def restaurants_status(cuisine: str, status: str, driver: Chrome) -> DataFrame:
 
     result = {
         "cuisine": cuisine,
-        "names": names,
-        "ratings": ratings,
+        "name": names,
+        "rating": ratings,
         "deliver_time": deliver_time,
         "deliver_cost": deliver_cost,
         "min_order": min_order,
@@ -72,12 +79,30 @@ def restaurants(cuisine: str, driver: Chrome, engine: Engine) -> None:
     :param engine: A central object that provides connectivity to a database.
     """
 
+    # Scroll down to the bottom of the page
+    # Set the amount of pixels to scroll by in each step
+    scroll_step = 250
+    scroll_from = 0
+
+    while True:
+        new_height = driver.execute_script("return document.body.scrollHeight")
+
+        for i in range(scroll_from, new_height, scroll_step):
+            driver.execute_script(f"window.scrollTo({scroll_from}, {i});")
+            time.sleep(0.1)
+
+        old_height = new_height
+        scroll_from = old_height
+        new_page_height = driver.execute_script("return document.body.scrollHeight")
+        if old_height == new_page_height:
+            break
+
     status = ["open", "pre-order", "closed"]
-    df = DataFrame()
-    for s in status:
-        df = concat(
-            [df, restaurants_status(cuisine=cuisine, status=s, driver=driver)],
-            ignore_index=True,
-        )
+    df = concat(
+        [restaurants_status(cuisine, s, driver) for s in status], ignore_index=True
+    )
+
+    if df.empty:
+        raise ValueError("Something went wrong with the restaurant list")
 
     df.to_sql(f"{cuisine}", con=engine, if_exists="replace", index=False)

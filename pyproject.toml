@@ -11,6 +11,7 @@ undetected-chromedriver = "^3.4.6"
 termcolor = "^2.2.0"
 SQLAlchemy = "^2.0.9"
 pandas = "^2.0.1"
+keyboard = "^0.13.5"
 
 [tool.poetry.dev-dependencies]
 black = "^23.3.0"
