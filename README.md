@@ -16,30 +16,25 @@ with python and the two main libraries: Selenium and BeautifulSoup.
 ![alt text](img/work_flow.jpg)
 
 ## Requirements
-* BeautifulSoup
-* json
-* numpy
+* bs4
+* keyboard
 * os
 * pandas
-* python 3.6+
+* python 3.8+
 * selenium
 * sqlalchemy
 * sys
-* termcolor
 * time
-* webdriver_manager
+* undetected_chromedriver
 
 
-Please note that in addition to the list of libraries mentioned above, you 
-will still need a browser driver to simulate browser sessions. In this project
-I use [ChromeDriver](https://chromedriver.chromium.org/downloads). However, 
-with webdriver_manager, you do not need to explicitly download binary 
-[ChromeDriver](https://chromedriver.chromium.org/downloads), unzip it somewhere 
-in your PC, and set path to it. The webdriver_manager module will take care of 
+Please note that with undetected_chromedriver, you do not need to explicitly 
+download binary [ChromeDriver](https://chromedriver.chromium.org/downloads), unzip it somewhere 
+in your PC, and set path to it. The undetected_chromedriver module will take care of 
 everything for you!
 
 ## Usage
-Run [thuisbezorgd.py](./__main__.py) and follow the instructions shown in the Python console.
+Run [\_\_main.py__](./__main__.py) and follow the instructions shown in the Python console.
 
 
 ## Contact
